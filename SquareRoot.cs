@@ -9,72 +9,73 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 
 
-	internal sealed class SquareRoot
+internal sealed class SquareRoot
+{
+	public static async Task<string> CalculateRoot(string input, int precision)
 	{
-		public static async Task<string> CalculateRoot(string input, int precision)
+		try
 		{
+			input = input.Replace(" ", string.Empty);
+			if (string.IsNullOrEmpty(input))
+			{
+				return "Input cannot be empty";
+			}
 			try
 			{
-				if (string.IsNullOrEmpty(input))
+				if (IsValidNumber(input))
 				{
-					return "Input cannot be empty";
+					double number = double.Parse(input);
+					// number = double.SetPrecisionWithRound(number, precision);
+					string sqrt = CalculateDoubleSquareRoot(number, precision);
+					return sqrt;
 				}
-				try
+				else if (IsValidExpression(input))
 				{
-					if (IsValidNumber(input))
-					{
-						double number = double.Parse(input);
-						// number = double.SetPrecisionWithRound(number, precision);
-						string sqrt = CalculateDoubleSquareRoot(number, precision);
-						return sqrt;
-					}
-					else if (IsValidExpression(input))
-					{
-						var sqrt = CalculateAnaliticsSquareRoot(input, precision);
-						return sqrt.Result;
-					}
-					else return "Bad string";
+					var sqrt = CalculateAnaliticsSquareRoot(input, precision);
+					return sqrt.Result;
 				}
-				catch (Exception ex)
-				{
-					return $"Unexpected error: {ex.Message}";
-				}
+				else return "Bad string";
 			}
 			catch (Exception ex)
 			{
-				return $"Critical error: {ex.Message}";
+				return $"Unexpected error: {ex.Message}";
 			}
 		}
-		private static bool IsValidNumber(string input)
+		catch (Exception ex)
 		{
-			HashSet<char> usedChars = new HashSet<char>();
-			foreach (char c in input)
-			{
-				if (!char.IsDigit(c))
-					if ((c == '.' || c == 'e' || c == '-') && !usedChars.Contains(c))
-					{
-						usedChars.Add(c);
-					}
-					else
-					{
-						return false;
-					}
-			}
-			return true;
+			return $"Critical error: {ex.Message}";
 		}
-		private static bool IsValidExpression(string input)
+	}
+	private static bool IsValidNumber(string input)
+	{
+		HashSet<char> usedChars = new HashSet<char>();
+		foreach (char c in input)
 		{
-			HashSet<char> allowedChars = new HashSet<char> { '.', '-', '*', '/', '+', 'e', 'x', '(', ')','^','s','i','n','c','o',' '};
-			foreach (char c in input)
-			{
-				if (!(char.IsDigit(c) || allowedChars.Contains(c)))
+			if (!char.IsDigit(c))
+				if ((c == '.' || c == 'e' || c == '-') && !usedChars.Contains(c))
+				{
+					usedChars.Add(c);
+				}
+				else
+				{
 					return false;
-			}
-			return input.Contains("os ") ? false : true;
+				}
 		}
-		private static string CalculateDoubleSquareRoot(double number,int precision)
+		return true;
+	}
+	private static bool IsValidExpression(string input)
+	{
+		HashSet<char> allowedChars = new HashSet<char> { '.', '-', '*', '/', '+', 'e', 'x', '(', ')', '^', 's', 'i', 'n', 'c', 'o', ' ' };
+		foreach (char c in input)
 		{
-			string output = "";
+			if (!(char.IsDigit(c) || allowedChars.Contains(c)))
+				return false;
+		}
+		return input.Contains("os ") ? false : true;
+	}
+	private static string CalculateDoubleSquareRoot(double number, int precision)
+	{
+		string output = "";
 		if (number > 0)
 		{
 			double squareRoot = Math.Sqrt(number);
@@ -87,7 +88,7 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 			{
 				output = squareRoot.ToString();
 			}
-			}
+		}
 		else if (number == 0)
 		{
 			output = "0";
@@ -112,25 +113,24 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 			output = parsedNumber + " * i\n";
 			output += "-" + parsedNumber + " * i\n";
 		}
-			return output;
-		}
-		private static async Task<string> CalculateAnaliticsSquareRoot(string expression,int prec)
-		{
-			StringBuilder builder = new StringBuilder(expression);
-			builder.Replace("**", "^");
-			builder.Replace(" ", string.Empty);
-			builder.Replace("+x", "+1*x");
-			builder.Replace("(x", "(1*x");
-			for (int i = 0; i < 10; i++)
+		return output;
+	}
+	private static async Task<string> CalculateAnaliticsSquareRoot(string expression, int prec)
+	{
+		StringBuilder builder = new StringBuilder(expression);
+		builder.Replace("**", "^");
+		builder.Replace("+x", "+1*x");
+		builder.Replace("(x", "(1*x");
+		for (int i = 0; i < 10; i++)
 		{
 			builder.Replace($"{i}x", $"{i}*x");
 		}
-			expression = builder.ToString();
-			Console.WriteLine(expression);
-			if (expression[0] != '(')
-			{
-				expression = "1*" + expression;
-			}
+		expression = builder.ToString();
+		Console.WriteLine(expression);
+		if (expression[0] != '(')
+		{
+			expression = "1*" + expression;
+		}
 		if (expression.EndsWith("x^2"))
 		{
 			int charPos = expression.IndexOf("x");
@@ -163,10 +163,10 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 			int charPos = expression.IndexOf("(");
 			int charPosX = expression.IndexOf("x");
 			string subString = expression.Substring(charPosX);
-			string firstCoef = expression.Substring(charPos+1,charPosX-charPos-1);
+			string firstCoef = expression.Substring(charPos + 1, charPosX - charPos - 1);
 			charPos = subString.IndexOf(")");
 			subString = subString.Substring(0, charPos);
-			return firstCoef+subString;
+			return firstCoef + subString;
 		}
 		else
 		{
@@ -215,5 +215,5 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 				return "(" + expression + ")^(1/2)";
 			}
 		}
-		}
 	}
+}
