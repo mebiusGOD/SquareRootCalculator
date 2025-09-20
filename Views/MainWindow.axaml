@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="SquareRootCalculator.MainWindow"
+        Title="Square Root Calculator">
+
+	<StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+		<TextBlock Text="Введите число:" />
+		<TextBox x:Name="InputTextBox" Width="200" Margin="0,10,0,10" />
+		<TextBlock Text="Введите точность (знаки после запятой):" Margin="0,0,0,10" />
+		<TextBox x:Name="PrecisionTextBox" Width="200" Margin="0,0,0,10" />
+		<!-- По умолчанию пустое -->
+		<Button x:Name="CalculateButton" Content="Вычислить квадратный корень" Click="CalculateButton_Click" />
+		<TextBlock x:Name="ResultTextBlock" Text="Результат: " Margin="0,10,0,0" />
+	</StackPanel>
+</Window>
