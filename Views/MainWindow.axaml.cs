@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System;
+using static SquareRoot;
+using System.Threading.Tasks;
 
 namespace SquareRootCalculator
 {
@@ -17,38 +19,52 @@ namespace SquareRootCalculator
             AvaloniaXamlLoader.Load(this);
         }
 
-        private void CalculateButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        private async void CalculateButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            if (double.TryParse(this.FindControl<TextBox>("InputTextBox").Text, out double number))
+            // string resultText = "Р РµР·СѓР»СЊС‚Р°С‚: ";
+            if (int.TryParse(this.FindControl<TextBox>("PrecisionTextBox").Text, out int precision) && precision >= 0)
             {
-                if (number >= 0)
-                {
-                    double sqrt = Math.Sqrt(number);
-                    string resultText = "Результат: ";
-
-                    // Парсим точность
-                    if (int.TryParse(this.FindControl<TextBox>("PrecisionTextBox").Text, out int precision) && precision >= 0)
-                    {
-                        // Форматируем с указанной точностью (F для fixed-point)
-                        resultText += sqrt.ToString($"F{precision}");
-                    }
-                    else
-                    {
-                        // По умолчанию без форматирования
-                        resultText += sqrt.ToString();
-                    }
-
-                    this.FindControl<TextBlock>("ResultTextBlock").Text = resultText;
-                }
-                else
-                {
-                    this.FindControl<TextBlock>("ResultTextBlock").Text = "Ошибка: число должно быть неотрицательным";
-                }
+                string output = await SquareRoot.CalculateRoot(this.FindControl<TextBox>("InputTextBox").Text, precision);
+                this.FindControl<TextBlock>("ResultTextBlock").Text = $"Р РµР·СѓР»СЊС‚Р°С‚: {output}";
             }
             else
             {
-                this.FindControl<TextBlock>("ResultTextBlock").Text = "Ошибка: введите число";
+                string output = await SquareRoot.CalculateRoot(this.FindControl<TextBox>("InputTextBox").Text, 16);
+                this.FindControl<TextBlock>("ResultTextBlock").Text = $"Р РµР·СѓР»СЊС‚Р°С‚: {output}";
             }
+        
+            
+
+            // if (double.TryParse(this.FindControl<TextBox>("InputTextBox").Text, out double number))
+            // {
+            //     if (number >= 0)
+            //     {
+            //         double sqrt = Math.Sqrt(number);
+            //         string resultText = "Р РµР·СѓР»СЊС‚Р°С‚: ";
+
+            //         // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            //         if (int.TryParse(this.FindControl<TextBox>("PrecisionTextBox").Text, out int precision) && precision >= 0)
+            //         {
+            //             // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (F пїЅпїЅпїЅ fixed-point)
+            //             resultText += sqrt.ToString($"F{precision}");
+            //         }
+            //         else
+            //         {
+            //             // пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            //             resultText += sqrt.ToString();
+            //         }
+
+            //         this.FindControl<TextBlock>("ResultTextBlock").Text = resultText;
+            //     }
+            //     else
+            //     {
+            //         this.FindControl<TextBlock>("ResultTextBlock").Text = "пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ";
+            //     }
+            // }
+            // else
+            // {
+            //     this.FindControl<TextBlock>("ResultTextBlock").Text = "пїЅпїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ";
+            // }
         }
     }
 }
